@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "templatemod",
+  "version": "${version}",
+
+  "name": "Template Mod",
+  "description": "This mod is a template mod by UltrusBot, if you see this description, I am a fool.",
+  "authors": [
+    "UltrusBot"
+  ],
+  "contact": {
+    "homepage": "https://www.ultrusmods.me/",
+    "sources": "https://github.com/UltrusBot/UltrusModTemplate",
+    "issues": "https://github.com/UltrusBot/UltrusModTemplate/issues"
+  },
+
+  "license": "MIT",
+  "icon": "assets/templatemod/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "me.ultrusmods.templatemod.ExampleMod"
+    ]
+  },
+  "mixins": [
+    "templatemod.mixins.json"
+  ],
+
+  "depends": {
+    "fabric": "*",
+    "minecraft": "1.19.x",
+    "java": ">=17"
+  }
+}
