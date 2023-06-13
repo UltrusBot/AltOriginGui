@@ -6,7 +6,7 @@ plugins {
 	id "com.modrinth.minotaur" version "2.+"
 	id 'me.hypherionmc.cursegradle' version '2.0.1'
 }
-apply from: 'https://raw.githubusercontent.com/UltrusBot/GradleScripts/1deb0dd4b4553d7845e21442227abb4c29b17ee8/release.gradle'
+apply from: 'https://raw.githubusercontent.com/UltrusBot/GradleScripts/f7e1863c8a92a595193057b71ec7ad2360cb746a/release.gradle'
 
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
