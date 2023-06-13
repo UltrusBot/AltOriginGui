@@ -77,7 +77,7 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
             int finalI = i;
             addDrawableChild(ButtonWidget.builder(Text.of(""), b -> {
                 int index = finalI + (currentPage * COUNT_PER_PAGE);
-                if (index > maxSelection) {
+                if (index > maxSelection - 1) {
                     return;
                 }
                 currentOrigin = index;
