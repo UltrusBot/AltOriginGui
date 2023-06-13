@@ -1,34 +1,38 @@
 {
   "schemaVersion": 1,
-  "id": "templatemod",
+  "id": "altorigingui",
   "version": "${version}",
 
-  "name": "Template Mod",
-  "description": "This mod is a template mod by UltrusBot, if you see this description, I am a fool.",
+  "name": "Alternate Origin GUI",
+  "description": "Overhauls the origin selection screen to show multiple in a grid for selection.",
   "authors": [
     "UltrusBot"
   ],
   "contact": {
     "homepage": "https://www.ultrusmods.me/",
-    "sources": "https://github.com/UltrusBot/UltrusModTemplate",
-    "issues": "https://github.com/UltrusBot/UltrusModTemplate/issues"
+    "sources": "https://github.com/UltrusBot/AltOriginGui",
+    "issues": "https://github.com/UltrusBot/AltoriginGui/issues"
   },
 
   "license": "MIT",
-  "icon": "assets/templatemod/icon.png",
-  "environment": "*",
+  "icon": "assets/altorigingui/icon.png",
+  "environment": "client",
   "entrypoints": {
     "main": [
-      "me.ultrusmods.templatemod.ExampleMod"
+      "me.ultrusmods.altorigingui.AltOriginGuiMod"
+    ],
+    "preLaunch": [
+      "com.llamalad7.mixinextras.MixinExtrasBootstrap::init"
     ]
   },
   "mixins": [
-    "templatemod.mixins.json"
+    "altorigingui.mixins.json"
   ],
 
   "depends": {
     "fabric": "*",
     "minecraft": "1.19.x",
-    "java": ">=17"
+    "java": ">=17",
+    "origins": "*"
   }
 }

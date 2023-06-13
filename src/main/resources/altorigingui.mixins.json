@@ -1,11 +1,12 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "me.ultrusmods.templatemod.mixin",
+  "package": "me.ultrusmods.altorigingui.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
   ],
   "client": [
+    "ChoseOriginScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1
