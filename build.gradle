@@ -52,7 +52,7 @@ dependencies {
 var mod = createModReleaseMetadata(
 		"Alternate Origin UI v$project.version+${libs.minecraft.get().getVersionConstraint().displayName}",
 		file("$rootDir/CHANGELOG.md"),
-		["1.19.4"],
+		["1.19.2"],
 		["fabric", "quilt"],
 		"remapJar",
 		["remapSourcesJar"],
@@ -60,7 +60,7 @@ var mod = createModReleaseMetadata(
 		false
 )
 modrinthInfo(mod, "altorigingui", ["origins"])
-githubInfo(mod, "UltrusBot", "AltOriginGui", "1.19.4")
+githubInfo(mod, "UltrusBot", "AltOriginGui", "1.19.2")
 curseforgeInfo(mod, TaskPublishCurseForge, "873788", [], ["origins"])
 
 
