@@ -75,7 +75,7 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
             int actualX = (12 + (x * (ORIGIN_ICON_SIZE + 2))) + calculatedLeft;
             int actualY = (10 + (y * (ORIGIN_ICON_SIZE + 4))) + calculatedTop;
             int finalI = i;
-            addDrawableChild(ButtonWidget.builder(Text.of(""), b -> {
+            addDrawableChild(new ButtonWidget(actualX, actualY, 26, 26, Text.of(""), b -> {
                 int index = finalI + (currentPage * COUNT_PER_PAGE);
                 if (index > maxSelection - 1) {
                     return;
@@ -83,20 +83,20 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
                 currentOrigin = index;
                 Origin newOrigin = getCurrentOriginInternal();
                 showOrigin(newOrigin, layerList.get(currentLayerIndex), newOrigin == randomOrigin);
-            }).positionAndSize(actualX, actualY, 26, 26).build());
+            }));
             x++;
         }
 
         if(maxSelection > COUNT_PER_PAGE) {
-            addDrawableChild(ButtonWidget.builder(Text.of("<"), b -> {
+            addDrawableChild(new ButtonWidget(calculatedLeft, guiTop + windowHeight + 5, 20, 20, Text.of("<"), b -> {
                 currentPage = (currentPage - 1);
                 if(currentPage < 0) {
                     currentPage = pages;
                 }
-            }).positionAndSize(calculatedLeft, guiTop + windowHeight + 5, 20, 20).build());
-            addDrawableChild(ButtonWidget.builder(Text.of(">"), b -> {
+            }));
+            addDrawableChild(new ButtonWidget(calculatedLeft + CHOICES_WIDTH - 20, guiTop + windowHeight + 5, 20, 20, Text.of(">"), b -> {
                 currentPage = (currentPage + 1) % (pages + 1);
-            }).positionAndSize(calculatedLeft + CHOICES_WIDTH - 20, guiTop + windowHeight + 5, 20, 20).build());
+            }));
         }
     }
 
@@ -142,7 +142,7 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
                 Origin origin = originSelection.get(i);
                 boolean selected = origin.getIdentifier().equals(this.getCurrentOrigin().getIdentifier());
                 renderOriginWidget(matrices, mouseX, mouseY, delta, actualX, actualY, selected, origin);
-                this.itemRenderer.renderItemInGui(matrices, origin.getDisplayItem(), actualX + 5, actualY + 5);
+                this.itemRenderer.renderGuiItemIcon(origin.getDisplayItem(), actualX + 5, actualY + 5);
             }
 
             x++;
@@ -155,7 +155,7 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
         RenderSystem.setShaderTexture(0, ORIGINS_CHOICES);
         int u = selected ? 26 : 0;
         boolean mouseHovering = mouseX >= x && mouseY >= y && mouseX < x + 26 && mouseY < y + 26;
-        boolean guiSelected = (getFocused() instanceof ButtonWidget buttonWidget && buttonWidget.getX() == x && buttonWidget.getY() == y) || mouseHovering;
+        boolean guiSelected = (getFocused() instanceof ButtonWidget buttonWidget && buttonWidget.x == x && buttonWidget.y == y) || mouseHovering;
         if (guiSelected) {
                 u += 52;
         }
@@ -177,7 +177,7 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
         RenderSystem.setShaderTexture(0, ORIGINS_CHOICES);
         int u = selected ? 26 : 0;
         boolean mouseHovering = mouseX >= x && mouseY >= y && mouseX < x + 26 && mouseY < y + 26;
-        boolean guiSelected = (getFocused() instanceof ButtonWidget buttonWidget && buttonWidget.getX() == x && buttonWidget.getY() == y) || mouseHovering;
+        boolean guiSelected = (getFocused() instanceof ButtonWidget buttonWidget && buttonWidget.x == x && buttonWidget.y == y) || mouseHovering;
         if (guiSelected) {
             u += 52;
         }
