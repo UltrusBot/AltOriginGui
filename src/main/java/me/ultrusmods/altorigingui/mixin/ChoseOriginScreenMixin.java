@@ -14,6 +14,7 @@ import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -169,7 +170,7 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
 //            default -> drawTexture(matrices, x, y, 224, 104, 8, 8);
 //        }
         if (mouseHovering) {
-            Text text = Text.translatable(getCurrentLayer().getTranslationKey()).append(": ").append(origin.getName());
+            Text text = new TranslatableText(getCurrentLayer().getTranslationKey()).append(": ").append(origin.getName());
             renderTooltip(matrices, text, mouseX, mouseY);
         }
     }
