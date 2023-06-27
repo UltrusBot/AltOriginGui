@@ -10,9 +10,9 @@ import io.github.apace100.origins.screen.OriginDisplayScreen;
 import me.ultrusmods.altorigingui.AltOriginGuiMod;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Final;
@@ -115,16 +115,16 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
     }
 
     @Inject(method = "render", at = @At("TAIL"))
-    void addRendering(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        renderOriginChoicesBox(matrices, mouseX, mouseY, delta);
+    void addRendering(GuiGraphics context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        renderOriginChoicesBox(context, mouseX, mouseY, delta);
         tickTime += delta;
     }
 
 
     @Unique
-    public void renderOriginChoicesBox(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        RenderSystem.setShaderTexture(0, ORIGINS_CHOICES);
-        drawTexture(matrices, calculatedLeft, calculatedTop, 0, 0, CHOICES_WIDTH, CHOICES_HEIGHT);
+    public void renderOriginChoicesBox(GuiGraphics context, int mouseX, int mouseY, float delta) {
+//        RenderSystem.setShaderTexture(0, ORIGINS_CHOICES);
+        context.drawTexture(ORIGINS_CHOICES, calculatedLeft, calculatedTop, 0, 0, CHOICES_WIDTH, CHOICES_HEIGHT);
         int x = 0;
         int y = 0;
         for (int i = (currentPage * COUNT_PER_PAGE); i < Math.min((currentPage + 1) * COUNT_PER_PAGE, maxSelection); i++) {
@@ -137,21 +137,21 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
             if (i >= originSelection.size()) {
                 // This is the random origin
                 boolean selected = this.getCurrentOrigin().getIdentifier().equals(Origins.identifier("random"));
-                renderRandomOrigin(matrices, mouseX, mouseY, delta, actualX, actualY, selected);
+                renderRandomOrigin(context, mouseX, mouseY, delta, actualX, actualY, selected);
             } else {
                 Origin origin = originSelection.get(i);
                 boolean selected = origin.getIdentifier().equals(this.getCurrentOrigin().getIdentifier());
-                renderOriginWidget(matrices, mouseX, mouseY, delta, actualX, actualY, selected, origin);
-                this.itemRenderer.renderItemInGui(matrices, origin.getDisplayItem(), actualX + 5, actualY + 5);
+                renderOriginWidget(context, mouseX, mouseY, delta, actualX, actualY, selected, origin);
+                context.drawItem(origin.getDisplayItem(), actualX + 5, actualY + 5);
             }
 
             x++;
         }
-        drawCenteredTextWithShadow(matrices, this.textRenderer, Text.of((currentPage + 1) + "/" + (pages + 1)).asOrderedText(), calculatedLeft + (CHOICES_WIDTH / 2), guiTop + windowHeight + 5 + this.textRenderer.fontHeight/2, 0xFFFFFF);
+        context.drawCenteredShadowedText(this.textRenderer, Text.of((currentPage + 1) + "/" + (pages + 1)).asOrderedText(), calculatedLeft + (CHOICES_WIDTH / 2), guiTop + windowHeight + 5 + this.textRenderer.fontHeight/2, 0xFFFFFF);
 
     }
 
-    public void renderOriginWidget(MatrixStack matrices, int mouseX, int mouseY, float delta, int x, int y, boolean selected, Origin origin) {
+    public void renderOriginWidget(GuiGraphics context, int mouseX, int mouseY, float delta, int x, int y, boolean selected, Origin origin) {
         RenderSystem.setShaderTexture(0, ORIGINS_CHOICES);
         int u = selected ? 26 : 0;
         boolean mouseHovering = mouseX >= x && mouseY >= y && mouseX < x + 26 && mouseY < y + 26;
@@ -159,9 +159,9 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
         if (guiSelected) {
                 u += 52;
         }
-        drawTexture(matrices, x, y, 230, u, 26, 26);
+        context.drawTexture(ORIGINS_CHOICES, x, y, 230, u, 26, 26);
         var impact = origin.getImpact();
-        drawTexture(matrices, x, y, 224 + (impact.ordinal() * 8), guiSelected ? 112 : 104, 8, 8);
+        context.drawTexture(ORIGINS_CHOICES, x, y, 224 + (impact.ordinal() * 8), guiSelected ? 112 : 104, 8, 8);
 //        switch(impact) {
 //            case LOW -> drawTexture(matrices, x, y, 232, 104, 8, 8);
 //            case MEDIUM -> drawTexture(matrices, x, y, 240, 104, 8, 8);
@@ -170,21 +170,20 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
 //        }
         if (mouseHovering) {
             Text text = Text.translatable(getCurrentLayer().getTranslationKey()).append(": ").append(origin.getName());
-            renderTooltip(matrices, text, mouseX, mouseY);
+            context.drawTooltip(this.textRenderer, text, mouseX, mouseY);
         }
     }
-    public void renderRandomOrigin(MatrixStack matrices, int mouseX, int mouseY, float delta, int x, int y, boolean selected) {
-        RenderSystem.setShaderTexture(0, ORIGINS_CHOICES);
+    public void renderRandomOrigin(GuiGraphics context, int mouseX, int mouseY, float delta, int x, int y, boolean selected) {
         int u = selected ? 26 : 0;
         boolean mouseHovering = mouseX >= x && mouseY >= y && mouseX < x + 26 && mouseY < y + 26;
         boolean guiSelected = (getFocused() instanceof ButtonWidget buttonWidget && buttonWidget.getX() == x && buttonWidget.getY() == y) || mouseHovering;
         if (guiSelected) {
             u += 52;
         }
-        drawTexture(matrices, x, y, 230, u, 26, 26);
-        drawTexture(matrices, x + 6, y + 5, 243, 120, 13, 16);
+        context.drawTexture(ORIGINS_CHOICES, x, y, 230, u, 26, 26);
+        context.drawTexture(ORIGINS_CHOICES, x + 6, y + 5, 243, 120, 13, 16);
         int impact = (int) (tickTime / 15.0) % 4;
-        drawTexture(matrices, x, y, 224 + (impact * 8), guiSelected ? 112 : 104, 8, 8);
+        context.drawTexture(ORIGINS_CHOICES, x, y, 224 + (impact * 8), guiSelected ? 112 : 104, 8, 8);
 
     }
 }
