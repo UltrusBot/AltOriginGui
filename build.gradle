@@ -49,7 +49,7 @@ dependencies {
 }
 
 var mod = createModReleaseMetadata(
-		"Alternate Origin UI v$project.version+${libs.minecraft.get().getVersionConstraint().displayName}}",
+		"Alternate Origin UI v$project.version+${libs.minecraft.get().getVersionConstraint().displayName}",
 		file("$rootDir/CHANGELOG.md"),
 		["1.20.1"],
 		["fabric", "quilt"],
