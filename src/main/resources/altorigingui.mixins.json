@@ -6,7 +6,8 @@
   "mixins": [
   ],
   "client": [
-    "ChoseOriginScreenMixin"
+    "ChoseOriginScreenMixin",
+    "OriginDisplayScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1
