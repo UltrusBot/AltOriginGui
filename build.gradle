@@ -1,5 +1,4 @@
 import net.darkhax.curseforgegradle.TaskPublishCurseForge
-
 plugins {
 	id 'fabric-loom' version '0.11.+'
 	id 'maven-publish'
@@ -9,7 +8,6 @@ plugins {
 	id 'net.darkhax.curseforgegradle' version '1.1.15'
 }
 apply from: "https://raw.githubusercontent.com/UltrusBot/GradleScripts/${project.upload_script_version}/release.gradle"
-
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
@@ -32,7 +30,11 @@ repositories {
 	maven { url = "https://maven.jamieswhiteshirt.com/libs-release/" }
 	maven { url = "https://maven.shedaniel.me/" }
 	maven { url = "https://maven.terraformersmc.com/" }
-	maven { url = "https://ladysnake.jfrog.io/artifactory/mods" }
+	maven {
+		name = 'Ladysnake Mods'
+		url = 'https://maven.ladysnake.org/releases'
+	}
+	mavenLocal()
 }
 
 dependencies {
