@@ -64,7 +64,7 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
 
         this.guiTop = (this.height - windowHeight) / 2;
         this.guiLeft = calculatedLeft + CHOICES_WIDTH + 10;
-        this.pages = Math.round((float) maxSelection / COUNT_PER_PAGE);
+        this.pages = (int)Math.ceil((float) maxSelection / COUNT_PER_PAGE);
         int x = 0;
         int y = 0;
         for (int i = 0; i < Math.min(maxSelection, 35); i++) {
@@ -91,11 +91,11 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
             addDrawableChild(ButtonWidget.builder(Text.of("<"), b -> {
                 currentPage = (currentPage - 1);
                 if(currentPage < 0) {
-                    currentPage = pages;
+                    currentPage = pages - 1;
                 }
             }).positionAndSize(calculatedLeft, guiTop + windowHeight + 5, 20, 20).build());
             addDrawableChild(ButtonWidget.builder(Text.of(">"), b -> {
-                currentPage = (currentPage + 1) % (pages + 1);
+                currentPage = (currentPage + 1) % (pages);
             }).positionAndSize(calculatedLeft + CHOICES_WIDTH - 20, guiTop + windowHeight + 5, 20, 20).build());
         }
     }
@@ -147,7 +147,7 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
 
             x++;
         }
-        drawCenteredTextWithShadow(matrices, this.textRenderer, Text.of((currentPage + 1) + "/" + (pages + 1)).asOrderedText(), calculatedLeft + (CHOICES_WIDTH / 2), guiTop + windowHeight + 5 + this.textRenderer.fontHeight/2, 0xFFFFFF);
+        drawCenteredTextWithShadow(matrices, this.textRenderer, Text.of((currentPage + 1) + "/" + (pages)).asOrderedText(), calculatedLeft + (CHOICES_WIDTH / 2), guiTop + windowHeight + 5 + this.textRenderer.fontHeight/2, 0xFFFFFF);
 
     }
 
