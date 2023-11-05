@@ -30,14 +30,14 @@ import java.util.List;
 public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
 
     @Shadow @Final private List<Origin> originSelection;
-    @Shadow private int currentOrigin;
-
-    @Shadow protected abstract Origin getCurrentOriginInternal();
-
     @Shadow @Final private ArrayList<OriginLayer> layerList;
     @Shadow private int currentLayerIndex;
     @Shadow private Origin randomOrigin;
     @Shadow private int maxSelection;
+
+    @Shadow public abstract Origin getCurrentOrigin();
+
+    @Shadow private int currentOriginIndex;
     private static final Identifier ORIGINS_CHOICES = new Identifier(AltOriginGuiMod.MOD_ID, "textures/gui/origin_choices.png");
     private static final int CHOICES_WIDTH = 219;
     private static final int CHOICES_HEIGHT = 182;
@@ -60,9 +60,9 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
     @Inject(method = "init", at = @At(value = "INVOKE", target = "Lio/github/apace100/origins/screen/OriginDisplayScreen;init()V", shift = At.Shift.AFTER))
     protected void changeGuiPosition(CallbackInfo ci) {
         this.calculatedTop = (this.height - CHOICES_HEIGHT) / 2;
-        this.calculatedLeft = (this.width - (CHOICES_WIDTH + 10 + windowWidth)) / 2;
+        this.calculatedLeft = (this.width - (CHOICES_WIDTH + 10 + WINDOW_WIDTH)) / 2;
 
-        this.guiTop = (this.height - windowHeight) / 2;
+        this.guiTop = (this.height - WINDOW_HEIGHT) / 2;
         this.guiLeft = calculatedLeft + CHOICES_WIDTH + 10;
         this.pages = (int)Math.ceil((float) maxSelection / COUNT_PER_PAGE);
         int x = 0;
@@ -80,8 +80,8 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
                 if (index > maxSelection - 1) {
                     return;
                 }
-                currentOrigin = index;
-                Origin newOrigin = getCurrentOriginInternal();
+                currentOriginIndex = index;
+                Origin newOrigin = getCurrentOrigin();
                 showOrigin(newOrigin, layerList.get(currentLayerIndex), newOrigin == randomOrigin);
             }).positionAndSize(actualX, actualY, 26, 26).build());
             x++;
@@ -93,23 +93,23 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
                 if(currentPage < 0) {
                     currentPage = pages - 1;
                 }
-            }).positionAndSize(calculatedLeft, guiTop + windowHeight + 5, 20, 20).build());
+            }).positionAndSize(calculatedLeft, guiTop + WINDOW_HEIGHT + 5, 20, 20).build());
             addDrawableChild(ButtonWidget.builder(Text.of(">"), b -> {
                 currentPage = (currentPage + 1) % (pages);
-            }).positionAndSize(calculatedLeft + CHOICES_WIDTH - 20, guiTop + windowHeight + 5, 20, 20).build());
+            }).positionAndSize(calculatedLeft + CHOICES_WIDTH - 20, guiTop + WINDOW_HEIGHT + 5, 20, 20).build());
         }
     }
 
     @WrapWithCondition(
             method = "init",
-            at = @At(value = "INVOKE", target = "Lio/github/apace100/origins/screen/ChooseOriginScreen;addDrawableChild(Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;", ordinal = 0))
+            at = @At(value = "INVOKE", target = "Lio/github/apace100/origins/screen/ChooseOriginScreen;addDrawableChild(Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;", ordinal = 1))
     public <T extends Element & Drawable & Selectable> boolean disableFirstArrowButton(ChooseOriginScreen screen, T element) {
         return false;
     }
 
     @WrapWithCondition(
             method = "init",
-            at = @At(value = "INVOKE", target = "Lio/github/apace100/origins/screen/ChooseOriginScreen;addDrawableChild(Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;", ordinal = 1))
+            at = @At(value = "INVOKE", target = "Lio/github/apace100/origins/screen/ChooseOriginScreen;addDrawableChild(Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;", ordinal = 2))
     public <T extends Element & Drawable & Selectable> boolean disableSecondArrowButton(ChooseOriginScreen screen, T element) {
         return false;
     }
@@ -147,7 +147,7 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
 
             x++;
         }
-        context.drawCenteredShadowedText(this.textRenderer, Text.of((currentPage + 1) + "/" + (pages)).asOrderedText(), calculatedLeft + (CHOICES_WIDTH / 2), guiTop + windowHeight + 5 + this.textRenderer.fontHeight/2, 0xFFFFFF);
+        context.drawCenteredShadowedText(this.textRenderer, Text.of((currentPage + 1) + "/" + (pages)).asOrderedText(), calculatedLeft + (CHOICES_WIDTH / 2), guiTop + WINDOW_HEIGHT + 5 + this.textRenderer.fontHeight/2, 0xFFFFFF);
 
     }
 

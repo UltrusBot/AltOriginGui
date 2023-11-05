@@ -1,17 +1,15 @@
-import net.darkhax.curseforgegradle.TaskPublishCurseForge
 plugins {
-	id 'fabric-loom' version '0.11.+'
+	alias libs.plugins.fabric.loom
+	alias libs.plugins.loom.quiltflower
+	alias libs.plugins.publishing
 	id 'maven-publish'
-	id 'io.github.juuxel.loom-quiltflower' version '1.6.0'
-	id "com.github.breadmoirai.github-release" version "2.4.1"
-	id "com.modrinth.minotaur" version "2.+"
-	id 'net.darkhax.curseforgegradle' version '1.1.15'
 }
-apply from: "https://raw.githubusercontent.com/UltrusBot/GradleScripts/${project.upload_script_version}/release.gradle"
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
-archivesBaseName = "${mod_name}-${libs.minecraft.get().getVersionConstraint().displayName}"
+base {
+	archivesName = project.archives_base_name
+}
 version = project.mod_version
 group = project.maven_group
 
@@ -33,6 +31,11 @@ repositories {
 	maven {
 		name = 'Ladysnake Mods'
 		url = 'https://maven.ladysnake.org/releases'
+		content {
+			includeGroup 'io.github.ladysnake'
+			includeGroupByRegex 'io\\.github\\.onyxstudios.*'
+			includeGroupByRegex 'dev\\.onyxstudios.*'
+		}
 	}
 	mavenLocal()
 }
@@ -51,21 +54,46 @@ dependencies {
 
 }
 
-var mod = createModReleaseMetadata(
-		"Alternate Origin UI v$project.version+${libs.minecraft.get().getVersionConstraint().displayName}",
-		file("$rootDir/CHANGELOG.md"),
-		["1.20.1"],
-		["fabric", "quilt"],
-		"remapJar",
-		["remapSourcesJar"],
-		"v${project.version}+${libs.minecraft.get().getVersionConstraint().displayName}",
-		false
-)
-modrinthInfo(mod, "altorigingui", ["origins"])
-githubInfo(mod, "UltrusBot", "AltOriginGui", "1.20")
-curseforgeInfo(mod, TaskPublishCurseForge, "873788", [], ["origins"])
+//var mod = createModReleaseMetadata(
+//		"Alternate Origin UI v$project.version+${libs.minecraft.get().getVersionConstraint().displayName}",
+//		file("$rootDir/CHANGELOG.md"),
+//		["1.20.1"],
+//		["fabric", "quilt"],
+//		"remapJar",
+//		["remapSourcesJar"],
+//		"v${project.version}+${libs.minecraft.get().getVersionConstraint().displayName}",
+//		false
+//)
+//modrinthInfo(mod, "altorigingui", ["origins"])
+//githubInfo(mod, "UltrusBot", "AltOriginGui", "1.20")
+//curseforgeInfo(mod, TaskPublishCurseForge, "873788", [], ["origins"])
 
+publishMods {
+	displayName = "Alternate Origin UI v$project.version+${libs.minecraft.get().getVersionConstraint().displayName}"
+	file = remapJar.archiveFile
+	changelog = file("$rootDir/CHANGELOG.md").text
+	version = project.version
+	type = STABLE
+	modLoaders.addAll("fabric", "quilt")
+	curseforge {
+		projectId = "873788"
+		minecraftVersions.add("1.20.2")
+		accessToken = providers.environmentVariable("CF_API_KEY")
+	}
+	modrinth {
+		projectId = "ldWHqZwQ"
+		minecraftVersions.add("1.20.2")
+		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+	}
+	github {
+		repository = "UltrusBot/AltOriginGui"
+		commitish = "1.20.2"
+		accessToken = providers.environmentVariable("GH_TOKEN")
+		tagName = "v$project.version"
+	}
 
+	dryRun = false
+}
 processResources {
 	inputs.property "version", project.version
 
@@ -88,7 +116,7 @@ java {
 
 jar {
 	from("LICENSE") {
-		rename { "${it}_${project.mod_name}"}
+		rename { "${it}_${project.archives_base_name}"}
 	}
 }
 
