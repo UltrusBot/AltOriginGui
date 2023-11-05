@@ -72,18 +72,24 @@ publishMods {
 	displayName = "Alternate Origin UI v$project.version+${libs.minecraft.get().getVersionConstraint().displayName}"
 	file = remapJar.archiveFile
 	changelog = file("$rootDir/CHANGELOG.md").text
-	version = project.version
+	version = "v${project.version}+${libs.minecraft.get().getVersionConstraint().displayName}"
 	type = STABLE
 	modLoaders.addAll("fabric", "quilt")
 	curseforge {
 		projectId = "873788"
 		minecraftVersions.add("1.20.2")
 		accessToken = providers.environmentVariable("CF_API_KEY")
+		requires {
+			slug = "origins"
+		}
 	}
 	modrinth {
 		projectId = "ldWHqZwQ"
 		minecraftVersions.add("1.20.2")
 		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+		requires {
+			slug = "origins"
+		}
 	}
 	github {
 		repository = "UltrusBot/AltOriginGui"
