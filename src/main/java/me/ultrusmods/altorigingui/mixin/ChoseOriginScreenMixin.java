@@ -161,13 +161,14 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
         }
         context.drawTexture(ORIGINS_CHOICES, x, y, 230, u, 26, 26);
         var impact = origin.getImpact();
-        context.drawTexture(ORIGINS_CHOICES, x, y, 224 + (impact.ordinal() * 8), guiSelected ? 112 : 104, 8, 8);
-//        switch(impact) {
-//            case LOW -> drawTexture(matrices, x, y, 232, 104, 8, 8);
-//            case MEDIUM -> drawTexture(matrices, x, y, 240, 104, 8, 8);
-//            case HIGH -> drawTexture(matrices, x, y, 248, 104, 8, 8);
-//            default -> drawTexture(matrices, x, y, 224, 104, 8, 8);
-//        }
+        switch(impact.name()) {
+            case "NONE" -> context.drawTexture(ORIGINS_CHOICES, x, y, 224, guiSelected ? 112 : 104, 8, 8);
+            case "LOW" -> context.drawTexture(ORIGINS_CHOICES, x, y, 232, guiSelected ? 112 : 104, 8, 8);
+            case "MEDIUM" -> context.drawTexture(ORIGINS_CHOICES, x, y, 240, guiSelected ? 112 : 104, 8, 8);
+            case "HIGH" -> context.drawTexture(ORIGINS_CHOICES, x, y, 248, guiSelected ? 112 : 104, 8, 8);
+            case "VERY_HIGH" -> context.drawTexture(ORIGINS_CHOICES, x, y, 248, guiSelected ? 144 : 136, 8, 8);
+            default -> context.drawTexture(ORIGINS_CHOICES, x, y, 240, guiSelected ? 144 : 136, 8, 8);
+        }
         if (mouseHovering) {
             Text text = Text.translatable(getCurrentLayer().getTranslationKey()).append(": ").append(origin.getName());
             context.drawTooltip(this.textRenderer, text, mouseX, mouseY);
