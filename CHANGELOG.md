@@ -1,1 +1,1 @@
-- Basic Update to 1.20.2
+- Added EO custom impact support
