@@ -1,23 +1,27 @@
 [versions]
 minecraft = "1.20.1"
-quilt_mappings = "1.20.1+build.5"
-fabric_loader = "0.14.21"
-fabric_api = "0.84.0+1.20.1"
-modmenu = "7.1.0"
-origins = "1.10.0"
-mixinextras = "0.0.11"
+fabric_loader = "0.15.10"
+fabric_api = "0.92.1+1.20.1"
+modmenu = "7.2.2"
+origins_fabric = "v1.10.0"
+origins_forge = "1.20.1-1.10.0.9"
+mixinextras = "0.4.0"
+forge= "1.20.1-47.2.30"
+caelus = "3.2.0+1.20.1"
+publishing = "0.6.3"
 
 [libraries]
 minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
-quilt_mappings = { module = "org.quiltmc:quilt-mappings", version.ref = "quilt_mappings" }
-
+forge = { module = "net.minecraftforge:forge", version.ref = "forge" }
 fabric_loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric_loader" }
 fabric_api = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric_api" }
 modmenu = { module = "com.terraformersmc:modmenu", version.ref = "modmenu" }
-origins = { module = "com.github.apace100:origins-fabric", version.ref = "origins" }
+origins_fabric = { module = "com.github.apace100:origins-fabric", version.ref = "origins_fabric" }
+origins_forge = { module = "maven.modrinth:origins-forge", version.ref = "origins_forge" }
 mixinextras = { module = "com.github.LlamaLad7:MixinExtras", version.ref = "mixinextras" }
-
+caelus = { module = "top.theillusivec4.caelus:caelus-forge", version.ref = "caelus" }
 # If you have multiple similar dependencies, you can declare a dependency bundle and reference it on the build script with "libs.bundles.example".
 [bundles]
 
 [plugins]
+publishing = { id = "me.modmuss50.mod-publish-plugin", version.ref = "publishing" }

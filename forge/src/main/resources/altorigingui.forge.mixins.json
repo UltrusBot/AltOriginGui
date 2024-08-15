@@ -2,11 +2,14 @@
   "required": true,
   "minVersion": "0.8",
   "package": "me.ultrusmods.altorigingui.mixin",
-  "compatibilityLevel": "JAVA_16",
+  "refmap": "${mod_id}.refmap.json",
+  "compatibilityLevel": "JAVA_17",
   "mixins": [
   ],
   "client": [
-    "ChoseOriginScreenMixin"
+    "ChooseOriginScreenMixinForge"
+  ],
+  "server": [
   ],
   "injectors": {
     "defaultRequire": 1

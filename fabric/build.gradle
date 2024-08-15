@@ -1,0 +1,126 @@
+plugins {
+    id 'java'
+    id 'idea'
+    id 'maven-publish'
+    id 'fabric-loom'
+    alias libs.plugins.publishing
+}
+base {
+    archivesName = "${mod_name}-fabric-${minecraft_version}"
+}
+repositories {
+    maven {
+        name = "Ladysnake Libs"
+        url = 'https://maven.ladysnake.org/releases'
+    }
+    maven {
+        url = 'https://maven.cafeteria.dev'
+        content {
+            includeGroup 'net.adriantodt.fabricmc'
+        }
+    }
+    maven {
+        url "https://maven.jamieswhiteshirt.com/libs-release"
+        content {
+            includeGroup "com.jamieswhiteshirt"
+        }
+    }
+    maven {
+        url "https://jitpack.io"
+    }
+    maven {
+        url "https://maven.shedaniel.me/"
+    }
+    maven {
+        url "https://maven.terraformersmc.com/"
+    }
+}
+dependencies {
+    minecraft libs.minecraft
+    mappings loom.officialMojangMappings()
+    modImplementation libs.fabric.loader
+    modImplementation libs.fabric.api
+    modImplementation libs.origins.fabric
+    modImplementation libs.modmenu
+    implementation project(":common")
+}
+publishMods {
+    displayName = "Alt Origin GUI v${project.version}+${libs.minecraft.get().version} Fabric"
+    file = remapJar.archiveFile
+    changelog = file("$rootDir/CHANGELOG.md").text
+    version = "${project.version}+${libs.minecraft.get().version}-fabric"
+    type = STABLE
+    modLoaders.addAll("fabric", "quilt")
+    curseforge {
+        projectId = "873788"
+        minecraftVersions.addAll("1.20.1")
+        accessToken = providers.gradleProperty("CF_API_KEY")
+        requires {
+            slug = "origins"
+        }
+    }
+    modrinth {
+        projectId = "ldWHqZwQ"
+        minecraftVersions.addAll("1.20.1")
+        accessToken = providers.gradleProperty("MODRINTH_TOKEN")
+        requires {
+            slug = "origins"
+        }
+    }
+    github {
+        accessToken = providers.gradleProperty("GH_TOKEN")
+        parent project(":").tasks.named("publishGithub")
+    }
+
+    dryRun = false
+}
+loom {
+    if (project(":common").file("src/main/resources/${mod_id}.accesswidener").exists()) {
+        accessWidenerPath.set(project(":common").file("src/main/resources/${mod_id}.accesswidener"))
+    }
+    mixin {
+        defaultRefmapName.set("${mod_id}.refmap.json")
+    }
+    runs {
+        client {
+            client()
+            setConfigName("Fabric Client")
+            ideConfigGenerated(true)
+            runDir("run")
+        }
+        server {
+            server()
+            setConfigName("Fabric Server")
+            ideConfigGenerated(true)
+            runDir("run")
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    source(project(":common").sourceSets.main.allSource)
+}
+tasks.withType(Javadoc).configureEach {
+    source(project(":common").sourceSets.main.allJava)
+}
+tasks.named("sourcesJar", Jar) {
+    from(project(":common").sourceSets.main.allSource)
+}
+
+processResources {
+    from project(":common").sourceSets.main.resources
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId base.archivesName.get()
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            url "file://" + System.getenv("local_maven")
+        }
+    }
+}
