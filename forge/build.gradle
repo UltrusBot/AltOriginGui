@@ -105,8 +105,7 @@ dependencies {
 }
 publishMods {
     displayName = "Alt Origin GUI v${project.version}+${libs.minecraft.get().version} Forge"
-    // Use the jarjar'd jar
-    file = tasks.jarJar.archiveFile
+    file = tasks.jar.archiveFile
     changelog = file("$rootDir/CHANGELOG.md").text
     version = "${project.version}+${libs.minecraft.get().version}-forge"
     type = STABLE
@@ -147,11 +146,11 @@ tasks.named("sourcesJar", Jar) {
 processResources {
     from project(":common").sourceSets.main.resources
 }
-tasks.named('jarJar') {
+tasks.jarJar.configure {
     archiveClassifier = ''
+    dependsOn('reobfJar')
 }
-jar.archiveClassifier = 'slim'
-jar.finalizedBy('reobfJar')
+jar.finalizedBy('jarJar')
 
 publishing {
     publications {
