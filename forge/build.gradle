@@ -14,7 +14,7 @@ mixin {
     config("${mod_id}.mixins.json")
     config("${mod_id}.forge.mixins.json")
 }
-
+jarJar.enable()
 minecraft {
     mappings channel: 'official', version: minecraft_version
 
@@ -105,7 +105,7 @@ dependencies {
 }
 publishMods {
     displayName = "Alt Origin GUI v${project.version}+${libs.minecraft.get().version} Forge"
-    file = tasks.jar.archiveFile
+    file = tasks.jarJar.archiveFile
     changelog = file("$rootDir/CHANGELOG.md").text
     version = "${project.version}+${libs.minecraft.get().version}-forge"
     type = STABLE
@@ -146,11 +146,15 @@ tasks.named("sourcesJar", Jar) {
 processResources {
     from project(":common").sourceSets.main.resources
 }
+tasks.build.dependsOn tasks.jarJar
 tasks.jarJar.configure {
     archiveClassifier = ''
-    dependsOn('reobfJar')
 }
-jar.finalizedBy('jarJar')
+reobf {
+    jarJar {}
+}
+tasks.jarJar.finalizedBy("reobfJarJar")
+jar.finalizedBy('reobfJar')
 
 publishing {
     publications {
