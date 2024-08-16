@@ -1,1 +1,1 @@
-- Rewrite mod to multiloader, supporting Origins for fabric & forge. 
+- Fix small issues from multiloader porting
