@@ -10,7 +10,7 @@ import io.github.apace100.origins.screen.OriginDisplayScreen;
 import me.ultrusmods.altorigingui.AltOriginGuiMod;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
@@ -23,22 +23,22 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.ArrayList;
+
 import java.util.List;
 
 @Mixin(ChooseOriginScreen.class)
 public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
 
     @Shadow @Final private List<Origin> originSelection;
-    @Shadow @Final private ArrayList<OriginLayer> layerList;
-    @Shadow private int currentLayerIndex;
+    @Shadow @Final private List<OriginLayer> layerList;
+    @Final @Shadow private int currentLayerIndex;
     @Shadow private Origin randomOrigin;
     @Shadow private int maxSelection;
 
     @Shadow public abstract Origin getCurrentOrigin();
 
     @Shadow private int currentOriginIndex;
-    private static final Identifier ORIGINS_CHOICES = new Identifier(AltOriginGuiMod.MOD_ID, "textures/gui/origin_choices.png");
+    private static final Identifier ORIGINS_CHOICES = Identifier.of(AltOriginGuiMod.MOD_ID, "textures/gui/origin_choices.png");
     private static final int CHOICES_WIDTH = 219;
     private static final int CHOICES_HEIGHT = 182;
 
@@ -83,7 +83,7 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
                 currentOriginIndex = index;
                 Origin newOrigin = getCurrentOrigin();
                 showOrigin(newOrigin, layerList.get(currentLayerIndex), newOrigin == randomOrigin);
-            }).positionAndSize(actualX, actualY, 26, 26).build());
+            }).position(actualX, actualY).size(26, 26).build());
             x++;
         }
 
@@ -93,10 +93,10 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
                 if(currentPage < 0) {
                     currentPage = pages - 1;
                 }
-            }).positionAndSize(calculatedLeft, guiTop + WINDOW_HEIGHT + 5, 20, 20).build());
+            }).position(calculatedLeft, guiTop + WINDOW_HEIGHT + 5).size(20, 20).build());
             addDrawableChild(ButtonWidget.builder(Text.of(">"), b -> {
                 currentPage = (currentPage + 1) % (pages);
-            }).positionAndSize(calculatedLeft + CHOICES_WIDTH - 20, guiTop + WINDOW_HEIGHT + 5, 20, 20).build());
+            }).position(calculatedLeft + CHOICES_WIDTH - 20, guiTop + WINDOW_HEIGHT + 5).size(20, 20).build());
         }
     }
 
@@ -115,14 +115,14 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
     }
 
     @Inject(method = "render", at = @At("TAIL"))
-    void addRendering(GuiGraphics context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+    void addRendering(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         renderOriginChoicesBox(context, mouseX, mouseY, delta);
         tickTime += delta;
     }
 
 
     @Unique
-    public void renderOriginChoicesBox(GuiGraphics context, int mouseX, int mouseY, float delta) {
+    public void renderOriginChoicesBox(DrawContext context, int mouseX, int mouseY, float delta) {
 //        RenderSystem.setShaderTexture(0, ORIGINS_CHOICES);
         context.drawTexture(ORIGINS_CHOICES, calculatedLeft, calculatedTop, 0, 0, CHOICES_WIDTH, CHOICES_HEIGHT);
         int x = 0;
@@ -136,22 +136,23 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
             int actualY = (10 + (y * (ORIGIN_ICON_SIZE + 4))) + calculatedTop;
             if (i >= originSelection.size()) {
                 // This is the random origin
-                boolean selected = this.getCurrentOrigin().getIdentifier().equals(Origins.identifier("random"));
+                boolean selected = this.getCurrentOrigin().getId().equals(Origins.identifier("random"));
                 renderRandomOrigin(context, mouseX, mouseY, delta, actualX, actualY, selected);
             } else {
                 Origin origin = originSelection.get(i);
-                boolean selected = origin.getIdentifier().equals(this.getCurrentOrigin().getIdentifier());
+                boolean selected = origin.getId().equals(this.getCurrentOrigin().getId());
                 renderOriginWidget(context, mouseX, mouseY, delta, actualX, actualY, selected, origin);
                 context.drawItem(origin.getDisplayItem(), actualX + 5, actualY + 5);
             }
 
             x++;
         }
-        context.drawCenteredShadowedText(this.textRenderer, Text.of((currentPage + 1) + "/" + (pages)).asOrderedText(), calculatedLeft + (CHOICES_WIDTH / 2), guiTop + WINDOW_HEIGHT + 5 + this.textRenderer.fontHeight/2, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.of((currentPage + 1) + "/" + (pages)).asOrderedText(), calculatedLeft + (CHOICES_WIDTH / 2), guiTop + WINDOW_HEIGHT + 5 + this.textRenderer.fontHeight/2, 0xFFFFFF);
 
     }
 
-    public void renderOriginWidget(GuiGraphics context, int mouseX, int mouseY, float delta, int x, int y, boolean selected, Origin origin) {
+    @Unique
+    public void renderOriginWidget(DrawContext context, int mouseX, int mouseY, float delta, int x, int y, boolean selected, Origin origin) {
         RenderSystem.setShaderTexture(0, ORIGINS_CHOICES);
         int u = selected ? 26 : 0;
         boolean mouseHovering = mouseX >= x && mouseY >= y && mouseX < x + 26 && mouseY < y + 26;
@@ -170,11 +171,11 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
             default -> context.drawTexture(ORIGINS_CHOICES, x, y, 240, guiSelected ? 144 : 136, 8, 8);
         }
         if (mouseHovering) {
-            Text text = Text.translatable(getCurrentLayer().getTranslationKey()).append(": ").append(origin.getName());
+            Text text = getCurrentLayer().getName().copy().append(": ").append(origin.getName());
             context.drawTooltip(this.textRenderer, text, mouseX, mouseY);
         }
     }
-    public void renderRandomOrigin(GuiGraphics context, int mouseX, int mouseY, float delta, int x, int y, boolean selected) {
+    public void renderRandomOrigin(DrawContext context, int mouseX, int mouseY, float delta, int x, int y, boolean selected) {
         int u = selected ? 26 : 0;
         boolean mouseHovering = mouseX >= x && mouseY >= y && mouseX < x + 26 && mouseY < y + 26;
         boolean guiSelected = (getFocused() instanceof ButtonWidget buttonWidget && buttonWidget.getX() == x && buttonWidget.getY() == y) || mouseHovering;

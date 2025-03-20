@@ -1,1 +1,2 @@
-- Added EO custom impact support
+- Updated to 1.21.1
+- Marked as beta as origins isn't stable for 1.21.1, and code may break

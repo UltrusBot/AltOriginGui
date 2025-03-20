@@ -1,24 +1,23 @@
 [versions]
-minecraft = "1.20.2"
-quilt_mappings = "1.20.2+build.2"
-fabric_loader = "0.15.7"
-fabric_api = "0.89.2+1.20.2"
-modmenu = "8.0.0"
-origins = "1.12.0"
+minecraft = "1.21.1"
+yarn = "1.21.1+build.3"
+fabric_loader = "0.16.10"
+fabric_api = "0.115.3+1.21.1"
+modmenu = "11.0.3"
+origins = "1.13.0-alpha.12+mc.1.21.1"
 mixinextras = "0.1.1"
 
-fabric_loom = "1.3-SNAPSHOT"
-loom_quiltflower = "1.6.0"
+fabric_loom = "1.10-SNAPSHOT"
 publishing = "0.3.5"
 
 [libraries]
 minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
-quilt_mappings = { module = "org.quiltmc:quilt-mappings", version.ref = "quilt_mappings" }
 
 fabric_loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric_loader" }
 fabric_api = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric_api" }
+yarn = { module = "net.fabricmc:yarn", version.ref = "yarn" }
 modmenu = { module = "com.terraformersmc:modmenu", version.ref = "modmenu" }
-origins = { module = "com.github.apace100:origins-fabric", version.ref = "origins" }
+origins = { module = "io.github.apace100:origins-fabric", version.ref = "origins" }
 mixinextras = { module = "com.github.LlamaLad7:MixinExtras", version.ref = "mixinextras" }
 
 # If you have multiple similar dependencies, you can declare a dependency bundle and reference it on the build script with "libs.bundles.example".
@@ -26,5 +25,4 @@ mixinextras = { module = "com.github.LlamaLad7:MixinExtras", version.ref = "mixi
 
 [plugins]
 fabric_loom = { id = "fabric-loom", version.ref = "fabric_loom" }
-loom_quiltflower = { id = "io.github.juuxel.loom-quiltflower", version.ref = "loom_quiltflower" }
 publishing = { id = "me.modmuss50.mod-publish-plugin", version.ref = "publishing" }
