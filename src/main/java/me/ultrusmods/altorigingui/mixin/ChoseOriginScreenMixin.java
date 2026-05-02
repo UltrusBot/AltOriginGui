@@ -29,15 +29,23 @@ import java.util.List;
 @Mixin(ChooseOriginScreen.class)
 public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
 
-    @Shadow @Final private List<Origin> originSelection;
-    @Shadow @Final private List<OriginLayer> layerList;
-    @Final @Shadow private int currentLayerIndex;
-    @Shadow private Origin randomOrigin;
-    @Shadow private int maxSelection;
+
 
     @Shadow public abstract Origin getCurrentOrigin();
 
-    @Shadow private int currentOriginIndex;
+    @Shadow
+    private int optionCount;
+    @Shadow
+    @Final
+    private int layerIndex;
+    @Shadow
+    @Final
+    private List<OriginLayer> layers;
+    @Shadow
+    private int originIndex;
+    @Shadow
+    @Final
+    private List<Origin> origins;
     private static final Identifier ORIGINS_CHOICES = Identifier.of(AltOriginGuiMod.MOD_ID, "textures/gui/origin_choices.png");
     private static final int CHOICES_WIDTH = 219;
     private static final int CHOICES_HEIGHT = 182;
@@ -57,17 +65,17 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
         super(title, showDirtBackground);
     }
 
-    @Inject(method = "init", at = @At(value = "INVOKE", target = "Lio/github/apace100/origins/screen/OriginDisplayScreen;init()V", shift = At.Shift.AFTER))
+    @Inject(method = "init", at = @At(value = "TAIL"))
     protected void changeGuiPosition(CallbackInfo ci) {
         this.calculatedTop = (this.height - CHOICES_HEIGHT) / 2;
         this.calculatedLeft = (this.width - (CHOICES_WIDTH + 10 + WINDOW_WIDTH)) / 2;
 
         this.guiTop = (this.height - WINDOW_HEIGHT) / 2;
         this.guiLeft = calculatedLeft + CHOICES_WIDTH + 10;
-        this.pages = (int)Math.ceil((float) maxSelection / COUNT_PER_PAGE);
+        this.pages = (int)Math.ceil((float) optionCount / COUNT_PER_PAGE);
         int x = 0;
         int y = 0;
-        for (int i = 0; i < Math.min(maxSelection, 35); i++) {
+        for (int i = 0; i < Math.min(optionCount, 35); i++) {
             if (x > 6) {
                 x = 0;
                 y++;
@@ -77,17 +85,17 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
             int finalI = i;
             addDrawableChild(ButtonWidget.builder(Text.of(""), b -> {
                 int index = finalI + (currentPage * COUNT_PER_PAGE);
-                if (index > maxSelection - 1) {
+                if (index > optionCount - 1) {
                     return;
                 }
-                currentOriginIndex = index;
+                originIndex = index;
                 Origin newOrigin = getCurrentOrigin();
-                showOrigin(newOrigin, layerList.get(currentLayerIndex), newOrigin == randomOrigin);
+                showOrigin(newOrigin, layers.get(layerIndex));
             }).position(actualX, actualY).size(26, 26).build());
             x++;
         }
 
-        if(maxSelection > COUNT_PER_PAGE) {
+        if(optionCount > COUNT_PER_PAGE) {
             addDrawableChild(ButtonWidget.builder(Text.of("<"), b -> {
                 currentPage = (currentPage - 1);
                 if(currentPage < 0) {
@@ -127,19 +135,19 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
         context.drawTexture(ORIGINS_CHOICES, calculatedLeft, calculatedTop, 0, 0, CHOICES_WIDTH, CHOICES_HEIGHT);
         int x = 0;
         int y = 0;
-        for (int i = (currentPage * COUNT_PER_PAGE); i < Math.min((currentPage + 1) * COUNT_PER_PAGE, maxSelection); i++) {
+        for (int i = (currentPage * COUNT_PER_PAGE); i < Math.min((currentPage + 1) * COUNT_PER_PAGE, optionCount); i++) {
             if (x > 6) {
                 x = 0;
                 y++;
             }
             int actualX = (12 + (x * (ORIGIN_ICON_SIZE + 2))) + calculatedLeft;
             int actualY = (10 + (y * (ORIGIN_ICON_SIZE + 4))) + calculatedTop;
-            if (i >= originSelection.size()) {
+            if (origins.get(i) == Origin.RANDOM) {
                 // This is the random origin
                 boolean selected = this.getCurrentOrigin().getId().equals(Origins.identifier("random"));
                 renderRandomOrigin(context, mouseX, mouseY, delta, actualX, actualY, selected);
             } else {
-                Origin origin = originSelection.get(i);
+                Origin origin = origins.get(i);
                 boolean selected = origin.getId().equals(this.getCurrentOrigin().getId());
                 renderOriginWidget(context, mouseX, mouseY, delta, actualX, actualY, selected, origin);
                 context.drawItem(origin.getDisplayItem(), actualX + 5, actualY + 5);
