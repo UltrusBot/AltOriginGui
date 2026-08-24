@@ -4,7 +4,7 @@ yarn = "1.21.1+build.3"
 fabric_loader = "0.16.10"
 fabric_api = "0.115.3+1.21.1"
 modmenu = "11.0.3"
-origins = "1.13.0-pre.2+mc.1.21.1"
+origins = "1.13.0-pre.3+mc.1.21.1"
 mixinextras = "0.1.1"
 
 fabric_loom = "1.10-SNAPSHOT"

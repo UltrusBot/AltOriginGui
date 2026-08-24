@@ -1,10 +1,10 @@
 package me.ultrusmods.altorigingui.mixin;
 
-import com.llamalad7.mixinextras.injector.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.apace100.origins.Origins;
 import io.github.apace100.origins.origin.Origin;
-import io.github.apace100.origins.origin.OriginLayer;
 import io.github.apace100.origins.screen.ChooseOriginScreen;
 import io.github.apace100.origins.screen.OriginDisplayScreen;
 import me.ultrusmods.altorigingui.AltOriginGuiMod;
@@ -14,6 +14,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,16 +32,10 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
 
 
 
-    @Shadow public abstract Origin getCurrentOrigin();
+    @Shadow protected abstract Origin getCurrentOrigin();
 
     @Shadow
     private int optionCount;
-    @Shadow
-    @Final
-    private int layerIndex;
-    @Shadow
-    @Final
-    private List<OriginLayer> layers;
     @Shadow
     private int originIndex;
     @Shadow
@@ -70,8 +65,20 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
         this.calculatedTop = (this.height - CHOICES_HEIGHT) / 2;
         this.calculatedLeft = (this.width - (CHOICES_WIDTH + 10 + WINDOW_WIDTH)) / 2;
 
-        this.guiTop = (this.height - WINDOW_HEIGHT) / 2;
-        this.guiLeft = calculatedLeft + CHOICES_WIDTH + 10;
+        this.windowWidget.setPosition(calculatedLeft + CHOICES_WIDTH + 10, (this.height - WINDOW_HEIGHT) / 2);
+
+        for (Element child : children()) {
+            if (child instanceof ButtonWidget button && button.getMessage().getContent() instanceof TranslatableTextContent translatableTextContent) {
+                if (translatableTextContent.getKey().equals("origins.gui.select")) {
+                    button.setPosition(
+                            windowWidget.getX() + windowWidget.getWidth() / 2 - 50,
+                            windowWidget.getY() + windowWidget.getHeight() + 5
+                    );
+                }
+                break;
+            }
+        }
+
         this.pages = (int)Math.ceil((float) optionCount / COUNT_PER_PAGE);
         int x = 0;
         int y = 0;
@@ -89,8 +96,7 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
                     return;
                 }
                 originIndex = index;
-                Origin newOrigin = getCurrentOrigin();
-                showOrigin(newOrigin, layers.get(layerIndex));
+                showCurrent(origin -> origin.getGuiMetadata().choosing());
             }).position(actualX, actualY).size(26, 26).build());
             x++;
         }
@@ -101,33 +107,31 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
                 if(currentPage < 0) {
                     currentPage = pages - 1;
                 }
-            }).position(calculatedLeft, guiTop + WINDOW_HEIGHT + 5).size(20, 20).build());
+            }).position(calculatedLeft, windowWidget.getY() + WINDOW_HEIGHT + 5).size(20, 20).build());
             addDrawableChild(ButtonWidget.builder(Text.of(">"), b -> {
                 currentPage = (currentPage + 1) % (pages);
-            }).position(calculatedLeft + CHOICES_WIDTH - 20, guiTop + WINDOW_HEIGHT + 5).size(20, 20).build());
+            }).position(calculatedLeft + CHOICES_WIDTH - 20, windowWidget.getY() + WINDOW_HEIGHT + 5).size(20, 20).build());
         }
+
+        addDrawable((context, mouseX, mouseY, delta) -> {
+            renderOriginChoicesBox(context, mouseX, mouseY, delta);
+            tickTime += delta;
+        });
     }
 
-    @WrapWithCondition(
+    @WrapOperation(
             method = "init",
             at = @At(value = "INVOKE", target = "Lio/github/apace100/origins/screen/ChooseOriginScreen;addDrawableChild(Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;", ordinal = 1))
-    public <T extends Element & Drawable & Selectable> boolean disableFirstArrowButton(ChooseOriginScreen screen, T element) {
-        return false;
+    public <T extends Element & Drawable & Selectable> Element disableFirstArrowButton(ChooseOriginScreen screen, T element, Operation<Element> original) {
+        return null;
     }
 
-    @WrapWithCondition(
+    @WrapOperation(
             method = "init",
             at = @At(value = "INVOKE", target = "Lio/github/apace100/origins/screen/ChooseOriginScreen;addDrawableChild(Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;", ordinal = 2))
-    public <T extends Element & Drawable & Selectable> boolean disableSecondArrowButton(ChooseOriginScreen screen, T element) {
-        return false;
+    public <T extends Element & Drawable & Selectable> Element disableSecondArrowButton(ChooseOriginScreen screen, T element, Operation<Element> original) {
+        return null;
     }
-
-    @Inject(method = "render", at = @At("TAIL"))
-    void addRendering(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        renderOriginChoicesBox(context, mouseX, mouseY, delta);
-        tickTime += delta;
-    }
-
 
     @Unique
     public void renderOriginChoicesBox(DrawContext context, int mouseX, int mouseY, float delta) {
@@ -155,7 +159,7 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
 
             x++;
         }
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.of((currentPage + 1) + "/" + (pages)).asOrderedText(), calculatedLeft + (CHOICES_WIDTH / 2), guiTop + WINDOW_HEIGHT + 5 + this.textRenderer.fontHeight/2, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.of((currentPage + 1) + "/" + (pages)).asOrderedText(), calculatedLeft + (CHOICES_WIDTH / 2), windowWidget.getY() + WINDOW_HEIGHT + 5 + this.textRenderer.fontHeight/2, 0xFFFFFF);
 
     }
 
@@ -166,7 +170,7 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
         boolean mouseHovering = mouseX >= x && mouseY >= y && mouseX < x + 26 && mouseY < y + 26;
         boolean guiSelected = (getFocused() instanceof ButtonWidget buttonWidget && buttonWidget.getX() == x && buttonWidget.getY() == y) || mouseHovering;
         if (guiSelected) {
-                u += 52;
+            u += 52;
         }
         context.drawTexture(ORIGINS_CHOICES, x, y, 230, u, 26, 26);
         var impact = origin.getImpact();
@@ -183,6 +187,7 @@ public abstract class ChoseOriginScreenMixin extends OriginDisplayScreen {
             context.drawTooltip(this.textRenderer, text, mouseX, mouseY);
         }
     }
+
     public void renderRandomOrigin(DrawContext context, int mouseX, int mouseY, float delta, int x, int y, boolean selected) {
         int u = selected ? 26 : 0;
         boolean mouseHovering = mouseX >= x && mouseY >= y && mouseX < x + 26 && mouseY < y + 26;
